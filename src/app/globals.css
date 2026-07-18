@@ -1,0 +1,683 @@
+@import "tailwindcss";
+
+:root {
+  --background: #ffd54f;
+  --foreground: #000000;
+  --metro: #02b0af;
+  --yellow: #ffd54f;
+  --water: #9b6fd6;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-outfit), ui-sans-serif, system-ui, sans-serif;
+}
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+  background: var(--background);
+  color: var(--foreground);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+.gm-style-cc,
+.gmnoprint a {
+  opacity: 0.28 !important;
+}
+
+/* —— Comic page chrome —— */
+.comic-page {
+  isolation: isolate;
+}
+
+.comic-halftone {
+  background-image: radial-gradient(
+    rgba(0, 0, 0, 0.09) 1px,
+    transparent 1.2px
+  );
+  background-size: 4px 4px;
+  mix-blend-mode: multiply;
+  opacity: 0.55;
+  mask-image: radial-gradient(
+    ellipse 65% 60% at 50% 50%,
+    transparent 12%,
+    black 82%
+  );
+}
+
+/* Unified purple wash — even around all edges, not just corners */
+.comic-vignette {
+  background: radial-gradient(
+    ellipse 70% 66% at 50% 50%,
+    transparent 28%,
+    rgba(155, 111, 214, 0.28) 52%,
+    rgba(155, 111, 214, 0.52) 72%,
+    rgba(155, 111, 214, 0.72) 100%
+  );
+  box-shadow:
+    inset 0 0 60px 12px rgba(155, 111, 214, 0.35),
+    inset 0 0 120px 28px rgba(155, 111, 214, 0.22);
+}
+
+.comic-panel {
+  border: 3px solid #000;
+  box-shadow: 5px 5px 0 #000;
+}
+
+/* —— Map loading signal —— */
+.map-loader-halftone {
+  background-image: radial-gradient(rgba(0, 0, 0, 0.1) 1px, transparent 1.2px);
+  background-size: 5px 5px;
+  mask-image: radial-gradient(ellipse 70% 70% at 50% 50%, black 10%, transparent 75%);
+}
+
+.map-loader-logo {
+  animation: map-loader-spin 6s linear infinite;
+}
+
+@keyframes map-loader-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+
+/* Soft cream keyline + aquamarine aura — matches yellow comic + Blue Line */
+.metro-logo-glow {
+  display: block;
+  border: 0;
+  background: transparent;
+  filter:
+    drop-shadow(0 0 1px rgba(255, 248, 220, 0.95))
+    drop-shadow(0 0 4px rgba(255, 213, 79, 0.7))
+    drop-shadow(0 0 12px rgba(2, 176, 175, 0.55))
+    drop-shadow(0 0 22px rgba(2, 176, 175, 0.28));
+  transition: filter 280ms ease;
+}
+
+.metro-logo-glow:hover {
+  filter:
+    drop-shadow(0 0 1.5px rgba(255, 248, 220, 1))
+    drop-shadow(0 0 6px rgba(255, 213, 79, 0.85))
+    drop-shadow(0 0 16px rgba(2, 176, 175, 0.7))
+    drop-shadow(0 0 28px rgba(2, 176, 175, 0.35));
+}
+
+/* —— Station markers (HTML overlay) —— */
+/* Hidden in the soft line until zoom / line touch reveals them */
+.station-node {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0;
+  margin: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 380ms cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform, opacity;
+}
+
+.station-node.is-revealed {
+  opacity: 1;
+  pointer-events: auto;
+  filter: none;
+}
+
+.station-node:hover:not(:disabled),
+.station-node:focus-visible:not(:disabled) {
+  z-index: 200;
+}
+
+.station-node.is-selected {
+  z-index: 150;
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.station-waves {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 12px;
+  height: 12px;
+  margin: -6px 0 0 -6px;
+  pointer-events: none;
+  opacity: 0;
+}
+
+.station-node.is-selected .station-waves {
+  opacity: 1;
+}
+
+.station-wave {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 2px solid #02b0af;
+  box-shadow:
+    0 0 8px rgba(2, 176, 175, 0.55),
+    inset 0 0 6px rgba(126, 234, 234, 0.35);
+  opacity: 0;
+  transform: scale(0.4);
+}
+
+.station-node.is-selected .station-wave {
+  animation: station-radiate 2.4s cubic-bezier(0.15, 0.7, 0.25, 1) infinite;
+}
+
+.station-node.is-selected .station-wave:nth-child(2) {
+  animation-delay: 0.8s;
+  border-color: #7eeaea;
+}
+
+.station-node.is-selected .station-wave:nth-child(3) {
+  animation-delay: 1.6s;
+  border-color: #ffd54f;
+}
+
+@keyframes station-radiate {
+  0% {
+    opacity: 0.85;
+    transform: scale(0.45);
+  }
+  70% {
+    opacity: 0.25;
+  }
+  100% {
+    opacity: 0;
+    transform: scale(7.5);
+  }
+}
+
+.station-node:disabled {
+  cursor: default;
+  pointer-events: none;
+}
+
+.station-node.is-future.is-revealed {
+  cursor: default;
+  pointer-events: auto;
+  opacity: 0.85;
+}
+
+.station-dot {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #ffd54f;
+  border: 2.5px solid #02b0af;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12);
+  transition:
+    transform 280ms cubic-bezier(0.22, 1, 0.36, 1),
+    background-color 220ms ease,
+    border-width 220ms ease,
+    box-shadow 280ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.station-core {
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: #018a89;
+  transition:
+    width 240ms cubic-bezier(0.22, 1, 0.36, 1),
+    height 240ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.station-halo {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 28px;
+  height: 28px;
+  margin: -14px 0 0 -14px;
+  border-radius: 50%;
+  background: #02b0af;
+  opacity: 0;
+  transform: scale(0.55);
+  transition:
+    opacity 220ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 280ms cubic-bezier(0.22, 1, 0.36, 1);
+  pointer-events: none;
+}
+
+.station-label {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 50%;
+  z-index: 2;
+  padding: 5px 10px;
+  border: 3px solid #000;
+  background: #ffd54f;
+  color: #000;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transform: translateX(-50%) translateY(-4px) scale(0.96);
+  transition:
+    opacity 200ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 260ms cubic-bezier(0.22, 1, 0.36, 1);
+  box-shadow: 3px 3px 0 #000;
+}
+
+.station-node:hover:not(:disabled) .station-halo,
+.station-node:focus-visible:not(:disabled) .station-halo {
+  opacity: 0.4;
+  transform: scale(1.15);
+}
+
+.station-node:hover:not(:disabled) .station-dot,
+.station-node:focus-visible:not(:disabled) .station-dot {
+  transform: scale(1.35);
+  background: #ffd54f;
+  border-width: 3px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
+}
+
+.station-node:hover:not(:disabled) .station-core,
+.station-node:focus-visible:not(:disabled) .station-core {
+  width: 6px;
+  height: 6px;
+}
+
+.station-node:hover:not(:disabled) .station-label,
+.station-node:focus-visible:not(:disabled) .station-label {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0) scale(1);
+}
+
+.station-node.is-selected .station-halo {
+  opacity: 0.45;
+  transform: scale(1.35);
+  background: #7eeaea;
+}
+
+.station-node.is-selected .station-dot {
+  transform: scale(1.5);
+  background: #ffd54f;
+  border-width: 3px;
+  border-color: #02b0af;
+  box-shadow:
+    0 0 0 3px rgba(2, 176, 175, 0.35),
+    0 0 16px rgba(2, 176, 175, 0.65),
+    0 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+.station-node.is-selected .station-core {
+  width: 7px;
+  height: 7px;
+}
+
+.station-node.is-selected .station-label {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.station-node.is-terminal .station-dot {
+  width: 18px;
+  height: 18px;
+}
+
+.station-node.is-future .station-dot {
+  background: #f2d6e0;
+  border-color: #e85a8c;
+  border-style: dashed;
+  box-shadow: none;
+  opacity: 0.85;
+}
+
+.station-node.is-future .station-core {
+  width: 0;
+  height: 0;
+}
+
+.station-node.is-future .station-label {
+  background: #f2d6e0;
+  color: #000;
+}
+
+.station-node.is-future:hover .station-label,
+.station-node.is-future:focus-visible .station-label {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0) scale(1);
+}
+
+/* —— Hotspot markers —— */
+.hotspot-node {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 40;
+  width: 24px;
+  height: 28px;
+  padding: 0;
+  margin: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  pointer-events: auto;
+  will-change: transform;
+}
+
+.hotspot-node.is-active {
+  z-index: 80;
+}
+
+.hotspot-inner {
+  position: relative;
+  display: block;
+  width: 24px;
+  height: 28px;
+  animation: hotspot-pop 420ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.hotspot-pin {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  margin: 0 auto;
+  border-radius: 50%;
+  border: 2px solid #000;
+  background: #ffd54f;
+  color: #000;
+  box-shadow: 1.5px 1.5px 0 #000;
+  transition:
+    transform 220ms cubic-bezier(0.22, 1, 0.36, 1),
+    background-color 180ms ease,
+    color 180ms ease;
+}
+
+.hotspot-pin::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: -4px;
+  width: 7px;
+  height: 7px;
+  border-right: 2px solid #000;
+  border-bottom: 2px solid #000;
+  background: inherit;
+  transform: translateX(-50%) rotate(45deg);
+  box-shadow: 1px 1px 0 #000;
+}
+
+.hotspot-pin-icon {
+  position: relative;
+  z-index: 1;
+  width: 11px;
+  height: 11px;
+}
+
+.hotspot-ping {
+  position: absolute;
+  left: 50%;
+  top: 11px;
+  width: 22px;
+  height: 22px;
+  margin-left: -11px;
+  margin-top: -11px;
+  border-radius: 50%;
+  border: 1.5px solid #02b0af;
+  opacity: 0;
+  transform: scale(0.6);
+  pointer-events: none;
+}
+
+.hotspot-node:hover .hotspot-pin,
+.hotspot-node:focus-visible .hotspot-pin {
+  transform: scale(1.1);
+  background: #02b0af;
+  color: #000;
+}
+
+.hotspot-node.is-active .hotspot-pin {
+  transform: scale(1.14);
+  background: #02b0af;
+  color: #000;
+  box-shadow: 2px 2px 0 #000;
+}
+
+.hotspot-node.is-active .hotspot-ping {
+  animation: hotspot-ring 1.4s ease-out infinite;
+}
+
+.hotspot-tip {
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 8px);
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  max-width: 120px;
+  padding: 3px 6px;
+  border: 1.5px solid #000;
+  background: #ffd54f;
+  color: #000;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  pointer-events: none;
+  opacity: 0;
+  transform: translateX(-50%) translateY(4px);
+  transition:
+    opacity 180ms ease,
+    transform 220ms cubic-bezier(0.22, 1, 0.36, 1);
+  box-shadow: 1.5px 1.5px 0 #000;
+}
+
+.hotspot-tip-tag {
+  font-size: 7px;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #017a79;
+}
+
+.hotspot-node:hover .hotspot-tip,
+.hotspot-node.is-active .hotspot-tip {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* Soft category tints */
+.hotspot-node.kind-cafe .hotspot-pin {
+  background: #ffe082;
+}
+.hotspot-node.kind-restaurant .hotspot-pin {
+  background: #ffab91;
+}
+.hotspot-node.kind-movie .hotspot-pin {
+  background: #ce93d8;
+}
+.hotspot-node.kind-park .hotspot-pin {
+  background: #a5d6a7;
+}
+.hotspot-node.kind-dessert .hotspot-pin {
+  background: #f8bbd0;
+}
+.hotspot-node.kind-music .hotspot-pin {
+  background: #80cbc4;
+}
+.hotspot-node.kind-books .hotspot-pin {
+  background: #bcaaa4;
+}
+.hotspot-node.kind-art .hotspot-pin {
+  background: #90caf9;
+}
+.hotspot-node.kind-shop .hotspot-pin {
+  background: #ffcc80;
+}
+.hotspot-node.kind-place .hotspot-pin {
+  background: #ffd54f;
+}
+
+@keyframes hotspot-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes hotspot-ring {
+  0% {
+    opacity: 0.7;
+    transform: scale(0.7);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(2.1);
+  }
+}
+
+/* —— Dotted station → place beams —— */
+.radar-beam {
+  stroke: #02b0af;
+  stroke-width: 2.75;
+  stroke-dasharray: 0.022 0.032;
+  opacity: 0.9;
+  animation: radar-crawl 1.2s linear infinite;
+}
+
+.radar-beam.is-active {
+  stroke: #015f5e;
+  stroke-width: 3.5;
+  filter: drop-shadow(0 0 5px rgba(2, 176, 175, 0.7));
+  stroke-dasharray: 0.024 0.028;
+}
+
+@keyframes radar-crawl {
+  from {
+    stroke-dashoffset: 0;
+  }
+  to {
+    stroke-dashoffset: -0.054;
+  }
+}
+
+/* —— Hotspot card deck —— */
+.hotspot-sheet {
+  background: linear-gradient(
+    to top,
+    rgba(0, 0, 0, 0.62) 0%,
+    rgba(0, 0, 0, 0.2) 58%,
+    transparent 100%
+  );
+  padding-top: 2rem;
+  overflow: visible;
+}
+
+.hotspot-scroller {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
+  padding-left: max(1.25rem, calc(50vw - min(38vw, 150px)));
+  padding-right: max(1.25rem, calc(50vw - min(38vw, 150px)));
+  scroll-padding-inline: max(1.25rem, calc(50vw - min(38vw, 150px)));
+}
+
+.hotspot-scroller::-webkit-scrollbar {
+  display: none;
+}
+
+.hotspot-card {
+  width: min(76vw, 300px);
+  cursor: pointer;
+  overflow: hidden;
+  transition:
+    filter 220ms ease,
+    opacity 220ms ease,
+    box-shadow 220ms ease;
+}
+
+.hotspot-card-media {
+  isolation: isolate;
+}
+
+.hotspot-card-badge {
+  max-width: calc(100% - 1rem);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.hotspot-card.is-active {
+  filter: none;
+  opacity: 1;
+  box-shadow: 6px 6px 0 #000;
+  z-index: 2;
+}
+
+.hotspot-card.is-side {
+  filter: blur(2.5px) saturate(0.75);
+  opacity: 0.48;
+  box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.35);
+  z-index: 1;
+}
+
+.hotspot-card.is-side:hover {
+  filter: blur(1px) saturate(0.9);
+  opacity: 0.82;
+}
+
+.chrome-fade-in {
+  animation: chrome-fade-in 420ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes chrome-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* —— Idle Blue Line zap —— */
+.metro-zap {
+  transition: opacity 480ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.metro-zap.is-on {
+  opacity: 1;
+}
+
+.metro-zap.is-off {
+  opacity: 0;
+}

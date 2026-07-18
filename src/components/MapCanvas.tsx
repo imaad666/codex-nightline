@@ -185,7 +185,7 @@ export default function MapCanvas() {
   const [placesRetry, setPlacesRetry] = useState(0);
   const [hoveredLine, setHoveredLine] = useState<LineId>(null);
   const placesCacheRef = useRef(
-    new Map<
+    new globalThis.Map<
       string,
       {
         expiresAt: number;

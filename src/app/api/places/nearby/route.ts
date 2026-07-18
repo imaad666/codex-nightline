@@ -248,7 +248,7 @@ export async function GET(request: NextRequest) {
   }
 
   if (
-    radiusParam != null &&
+    requested != null &&
     (!Number.isInteger(requested) || requested < 900 || requested > 3000)
   ) {
     return NextResponse.json(

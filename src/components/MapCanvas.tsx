@@ -187,6 +187,7 @@ export default function MapCanvas() {
   const [activeHotspotId, setActiveHotspotId] = useState<string | null>(null);
   const [loadingPlaces, setLoadingPlaces] = useState(false);
   const [placesError, setPlacesError] = useState<string | null>(null);
+  const [placesRetry, setPlacesRetry] = useState(0);
   const [hoveredLine, setHoveredLine] = useState<LineId>(null);
 
   const hotspots = spotMode === "rated" ? ratedSpots : closestSpots;
@@ -204,6 +205,7 @@ export default function MapCanvas() {
 
     const station = selected;
     const controller = new AbortController();
+    const timeout = window.setTimeout(() => controller.abort(), 12000);
     setLoadingPlaces(true);
     setPlacesError(null);
     setRatedSpots([]);
@@ -241,10 +243,11 @@ export default function MapCanvas() {
         setRatedSpots([]);
         setClosestSpots([]);
         setLoadingPlaces(false);
-      });
+      })
+      .finally(() => window.clearTimeout(timeout));
 
     return () => controller.abort();
-  }, [selected]);
+  }, [selected, placesRetry]);
 
   const handleSelect = useCallback((station: MetroStation) => {
     setSelected(station);
@@ -258,6 +261,7 @@ export default function MapCanvas() {
     setActiveHotspotId(null);
     setPlacesError(null);
     setSpotMode("rated");
+    setPlacesRetry(0);
   }, []);
 
   const handleHotspotSelect = useCallback((hotspot: Hotspot) => {
@@ -404,6 +408,7 @@ export default function MapCanvas() {
           activeId={activeHotspotId}
           loading={loadingPlaces}
           error={placesError}
+          onRetry={() => setPlacesRetry((value) => value + 1)}
           mode={spotMode}
           onModeChange={handleModeChange}
           onActiveChange={handleHotspotSelect}

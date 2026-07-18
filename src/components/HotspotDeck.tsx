@@ -13,6 +13,7 @@ interface HotspotDeckProps {
   activeId: string | null;
   loading: boolean;
   error: string | null;
+  onRetry: () => void;
   mode: SpotMode;
   onModeChange: (mode: SpotMode) => void;
   onActiveChange: (hotspot: Hotspot) => void;
@@ -25,6 +26,7 @@ export default function HotspotDeck({
   activeId,
   loading,
   error,
+  onRetry,
   mode,
   onModeChange,
   onActiveChange,
@@ -190,8 +192,18 @@ export default function HotspotDeck({
         )}
 
         {error && (
-          <div className="mx-5 comic-panel bg-[#FFD54F] px-4 py-3 text-[13px] font-semibold text-black sm:mx-8">
-            Couldn’t load Google places: {error}
+          <div
+            className="mx-5 flex items-center justify-between gap-4 comic-panel bg-[#FFD54F] px-4 py-3 text-[13px] font-semibold text-black sm:mx-8"
+            role="alert"
+          >
+            <span>Couldn’t load Google places: {error}</span>
+            <button
+              type="button"
+              onClick={onRetry}
+              className="shrink-0 border-2 border-black bg-black px-3 py-2 text-[11px] font-black uppercase tracking-[0.12em] text-[#FFD54F] transition hover:bg-[#02B0AF] hover:text-black"
+            >
+              Try again
+            </button>
           </div>
         )}
 

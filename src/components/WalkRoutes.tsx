@@ -10,6 +10,7 @@ interface WalkRoutesProps {
   station: MetroStation;
   hotspots: Hotspot[];
   activeId: string | null;
+  animationKey: string;
 }
 
 type Pt = { x: number; y: number };
@@ -44,6 +45,7 @@ export default function WalkRoutes({
   station,
   hotspots,
   activeId,
+  animationKey,
 }: WalkRoutesProps) {
   const map = useMap();
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -57,8 +59,8 @@ export default function WalkRoutes({
   const [routes, setRoutes] = useState<RouteGeom[]>([]);
 
   const waveKey = useMemo(
-    () => `${station.id}:${hotspots.map((h) => h.id).join(",")}`,
-    [station.id, hotspots],
+    () => `${animationKey}:${hotspots.map((h) => h.id).join(",")}`,
+    [animationKey, hotspots],
   );
 
   const compute = () => {
@@ -141,6 +143,7 @@ export default function WalkRoutes({
 
   return createPortal(
     <svg
+      key={waveKey}
       className="radar-routes-svg"
       style={{
         position: "absolute",

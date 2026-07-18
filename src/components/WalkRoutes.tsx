@@ -18,6 +18,7 @@ type RouteGeom = {
   id: string;
   d: string;
   active: boolean;
+  order: number;
 };
 
 function bearing(a: Pt, b: Pt) {
@@ -38,7 +39,7 @@ function radarPath(a: Pt, b: Pt, i: number, total: number) {
   return `M ${a.x} ${a.y} Q ${cx} ${cy} ${b.x} ${b.y}`;
 }
 
-/** Instant dotted beams from station → every nearby place. */
+/** Dotted beams that fan out from the selected station to nearby places. */
 export default function WalkRoutes({
   station,
   hotspots,
@@ -89,6 +90,7 @@ export default function WalkRoutes({
         id: item.spot.id,
         d: radarPath(originPt, item.pt, i, total),
         active: item.spot.id === active,
+        order: i,
       })),
     );
   };
@@ -151,14 +153,26 @@ export default function WalkRoutes({
       }}
     >
       {routes.map((r) => (
-        <path
-          key={`${waveKey}-${r.id}`}
-          d={r.d}
-          pathLength={1}
-          className={`radar-beam ${r.active ? "is-active" : ""}`}
-          fill="none"
-          strokeLinecap="round"
-        />
+        <g key={`${waveKey}-${r.id}`}>
+          <path
+            d={r.d}
+            pathLength={1}
+            className="radar-route-trace"
+            fill="none"
+            strokeLinecap="round"
+            style={{ animationDelay: `${r.order * 90}ms` }}
+          />
+          <path
+            d={r.d}
+            pathLength={1}
+            className={`radar-beam ${r.active ? "is-active" : ""}`}
+            fill="none"
+            strokeLinecap="round"
+            style={{
+              animationDelay: `${r.order * 90 + 360}ms, ${r.order * 90 + 360}ms`,
+            }}
+          />
+        </g>
       ))}
     </svg>,
     containerRef.current,

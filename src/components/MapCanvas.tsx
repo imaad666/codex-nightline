@@ -175,8 +175,8 @@ function SmoothCamera({
   return null;
 }
 
-const CHROME_INSET = "clamp(1.25rem, 4vw, 2.75rem)";
-const CHROME_TOP = "clamp(1.25rem, 3.5vh, 2.5rem)";
+const CHROME_INSET = "clamp(1.25rem, 7vw, 6rem)";
+const CHROME_TOP = "clamp(1.25rem, 6vh, 3.75rem)";
 
 export default function MapCanvas() {
   const pageRef = useRef<HTMLDivElement>(null);

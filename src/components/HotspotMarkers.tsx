@@ -122,7 +122,7 @@ export default function HotspotMarkers({
         >
           <span
             className="hotspot-inner"
-            style={{ animationDelay: `${i * 40}ms` }}
+            style={{ animationDelay: `${220 + i * 90}ms` }}
           >
             <span className="hotspot-ping" aria-hidden />
             <span className="hotspot-pin" aria-hidden>
